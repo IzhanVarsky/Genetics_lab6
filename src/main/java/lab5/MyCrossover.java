@@ -12,7 +12,7 @@ public class MyCrossover extends AbstractCrossover<double[]> {
     }
 
     protected List<double[]> mate(double[] p1, double[] p2, int i, Random random) {
-        ArrayList<double[]> children = new ArrayList<double[]>();
+        ArrayList<double[]> children = new ArrayList<>();
 
         // your implementation:
         assert i == 1;

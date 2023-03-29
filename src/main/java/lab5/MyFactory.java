@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class MyFactory extends AbstractCandidateFactory<double[]> {
 
-    private int dimension;
+    private final int dimension;
 
     public MyFactory(int dimension) {
         this.dimension = dimension;

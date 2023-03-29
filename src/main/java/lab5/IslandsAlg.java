@@ -22,33 +22,30 @@ public class IslandsAlg {
 
     public static void main(String[] args) {
         startTime = System.currentTimeMillis();
-        int dimension = 100; // dimension of problem
-        int complexity = 5; // fitness estimation time multiplicator
+        int dimension = MyConfig.dimension; // dimension of problem
+        int complexity = MyConfig.complexity; // fitness estimation time multiplicator
 
-        int islandCount = 2;
-        int realPopSize = 20; // size of population
-//        int populationSize = realPopSize / islandCount;
-        int populationSize = 1;
+        int islandCount = MyConfig.islandCount;
+        int populationSize = MyConfig.populationSize / islandCount; // size of population
 
-        int epochLength = 50;
-        int realIterationCount = 30000; // number of generations
-        int generations = realIterationCount / epochLength;
+        int epochLength = MyConfig.epochLength;
+        int generations = MyConfig.generations / epochLength; // number of generations
 
         Random random = new Random(); // random
 
         CandidateFactory<double[]> factory = new MyFactory(dimension); // generation of solutions
 
-        ArrayList<EvolutionaryOperator<double[]>> operators = new ArrayList<EvolutionaryOperator<double[]>>();
+        ArrayList<EvolutionaryOperator<double[]>> operators = new ArrayList<>();
         operators.add(new MyCrossover()); // Crossover
         operators.add(new MyMutation()); // Mutation
-        EvolutionPipeline<double[]> pipeline = new EvolutionPipeline<double[]>(operators);
+        EvolutionPipeline<double[]> pipeline = new EvolutionPipeline<>(operators);
 
         SelectionStrategy<Object> selection = new RouletteWheelSelection(); // Selection operator
 
         FitnessEvaluator<double[]> evaluator = new MultiFitnessFunction(dimension, complexity); // Fitness function
 
         final RingMigration ringMigration = new RingMigration();
-        IslandEvolution<double[]> island_model = new IslandEvolution<double[]>(
+        IslandEvolution<double[]> island_model = new IslandEvolution<>(
                 islandCount, ringMigration,
                 factory,
                 pipeline,
@@ -60,7 +57,7 @@ public class IslandsAlg {
         island_model.addEvolutionObserver(new IslandEvolutionObserver() {
             public void populationUpdate(PopulationData populationData) {
                 double bestFit = populationData.getBestCandidateFitness();
-                if (bestFit > 9.5 && res_gen == 0) {
+                if (bestFit > MyConfig.targetValue && res_gen == 0) {
                     res_gen = populationData.getGenerationNumber();
                     res_value = bestFit;
                     res_time = System.currentTimeMillis();
@@ -71,7 +68,7 @@ public class IslandsAlg {
 
             public void islandPopulationUpdate(int i, PopulationData populationData) {
                 double bestFit = populationData.getBestCandidateFitness();
-                if (bestFit > 9.5 && res_gen == 0) {
+                if (bestFit > MyConfig.targetValue && res_gen == 0) {
                     res_gen = populationData.getGenerationNumber();
                     res_value = bestFit;
                     res_time = System.currentTimeMillis();
@@ -83,12 +80,13 @@ public class IslandsAlg {
         });
 
         TerminationCondition terminate = new GenerationCount(generations);
-        island_model.evolve(populationSize, 0, epochLength, 2, terminate);
+
+        island_model.evolve(populationSize, MyConfig.eliteCount, epochLength, MyConfig.migrantCount, terminate);
 
         endTime = System.currentTimeMillis();
         System.out.println("============================================");
-        System.out.printf("Fitness value %f (>9.5) achieved at iteration num: %d in %d ms.%n",
-                res_value, res_gen, res_time - startTime);
+        System.out.printf("Fitness value %f (>%f) achieved at iteration num: %d in %d ms.%n",
+                res_value, MyConfig.targetValue, res_gen, res_time - startTime);
         System.out.println("Total estimated time: " + (endTime - startTime) + " ms");
     }
 }

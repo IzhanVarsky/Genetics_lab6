@@ -9,7 +9,7 @@ import java.util.Random;
 public class MyMutation implements EvolutionaryOperator<double[]> {
     public List<double[]> apply(List<double[]> population, Random random) {
         double bound = 5.0;
-        ArrayList<double[]> result = new ArrayList<double[]>();
+        ArrayList<double[]> result = new ArrayList<>();
         for (double[] individual : population) {
             final double[] clone = individual.clone();
             for (int i = 0; i < clone.length; i++) {
